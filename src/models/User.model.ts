@@ -1,5 +1,5 @@
 import {model, Schema} from "mongoose"
-import { EGenders } from "../types/user.types";
+import { EGenders } from "../enums";
 
 const userSchema = new Schema( {
     name: {
@@ -22,7 +22,8 @@ const userSchema = new Schema( {
         enum: EGenders
     },
 },{
-    versionKey: false
+    versionKey: false,
+    timestamps:true
 });
 
 export const User = model("user",userSchema)
