@@ -1,29 +1,41 @@
-import { Router} from "express";
-import {authController} from "../controllers";
-import {userMiddleware,authMiddleware} from "../midldewares";
+import {Router} from "express";
 
+import {authController} from "../controllers";
+import {
+    authMiddleware,
+    commonMiddleware,
+    userMiddleware,
+} from "../midldewares";
+import {UserValidator} from "../validators";
 
 const router = Router();
 
-
 router.post(
     "/register",
-    userMiddleware.isValidCreate,
+    commonMiddleware.isBodyValid(UserValidator.createUser),
     userMiddleware.getDynamicallyAndThrow("email"),
-    authController.register);
+    authController.register
+);
 
 router.post(
     "/login",
-    userMiddleware.isValidLogin,
+    commonMiddleware.isBodyValid(UserValidator.loginUser),
     userMiddleware.getDynamicallyOrThrow("email"),
-    authController.login);
+    authController.login
+);
+
+router.post(
+    "/password/change",
+    commonMiddleware.isBodyValid(UserValidator.changeUserPassword),
+    authMiddleware.checkAccessToken,
+    authController.changePassword
+);
 
 router.post(
     "/refresh",
     authMiddleware.checkRefreshToken,
-    authController.refresh);
-
+    authController.refresh
+);
 router.post("/login");
 
-
-export const authRouter =router;
+export const authRouter = router;

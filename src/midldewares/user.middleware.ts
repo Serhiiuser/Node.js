@@ -1,9 +1,7 @@
 import {Request, Response, NextFunction} from "express";
-import {isObjectIdOrHexString} from 'mongoose'
 
 import {User} from "../models";
 import {ApiError} from "../errors/";
-import {UserValidator} from "../validators";
 
 
 class UserMiddleware {
@@ -93,65 +91,7 @@ class UserMiddleware {
         };
     }
 
-// validators
-    public async isValidCreate(req: Request, res: Response, next: NextFunction): Promise<void> {
 
-        try {
-            const {error, value} = UserValidator.createUser.validate(req.body)
-
-            if (error) {
-                throw  new ApiError(error.message, 400)
-            }
-            req.body = value
-            next();
-        } catch (e: any) {
-            next(e);
-        }
-    }
-
-    public async isValidUpdate(req: Request, res: Response, next: NextFunction): Promise<void> {
-
-        try {
-            const {error, value} = UserValidator.updateUser.validate(req.body)
-
-            if (error) {
-                throw  new ApiError(error.message, 400)
-            }
-            req.body = value
-            next();
-        } catch (e: any) {
-            next(e);
-        }
-    }
-
-
-
-    public async isIdValid(req: Request, res: Response, next: NextFunction): Promise<void> {
-
-        try {
-            if (!isObjectIdOrHexString(req.params.userId)) {
-                throw  new ApiError("ID not valid", 400)
-            }
-            next();
-        } catch (e: any) {
-            next(e);
-        }
-    }
-
-    public async isValidLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
-
-        try {
-            const {error} = UserValidator.loginUser.validate(req.body)
-
-            if (error) {
-                throw  new ApiError(error.message, 400)
-            }
-
-            next();
-        } catch (e: any) {
-            next(e);
-        }
-    }
 }
 
 export const userMiddleware = new UserMiddleware();
