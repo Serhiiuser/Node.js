@@ -2,7 +2,7 @@ import {config} from "dotenv";
 
 config();
 export const configs = {
-    PORT: process.env.PORT || 5001,
+    PORT: process.env.PORT || 5002,
     DB_URL: process.env.DB_URL || 'goggle',
 
     ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'aaa',
@@ -13,6 +13,11 @@ export const configs = {
 
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN:process.env.TWILIO_AUTH_TOKEN,
-    TWILIO_SERVICE_SID:process.env.TWILIO_SERVICE_SID
+    TWILIO_SERVICE_SID:process.env.TWILIO_SERVICE_SID,
+
+    FORGOT_SECRET:process.env.JWT_FORGOT_SECRET ,
+    ACTIVATE_SECRET: process.env.JWT_ACTIVATE_SECRET,
+
+    FRONT_URL:process.env.FRONT_URL
 }
 

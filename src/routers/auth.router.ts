@@ -1,12 +1,9 @@
 import {Router} from "express";
 
 import {authController} from "../controllers";
-import {
-    authMiddleware,
-    commonMiddleware,
-    userMiddleware,
-} from "../midldewares";
+import {authMiddleware, commonMiddleware, userMiddleware,} from "../midldewares";
 import {UserValidator} from "../validators";
+import {EActionTokenType} from "../enums";
 
 const router = Router();
 
@@ -29,6 +26,30 @@ router.post(
     commonMiddleware.isBodyValid(UserValidator.changeUserPassword),
     authMiddleware.checkAccessToken,
     authController.changePassword
+);
+router.post(
+    "/password/forgot",
+    userMiddleware.getDynamicallyOrThrow("email"),
+    authController.forgotPassword
+);
+router.put(
+    `/password/forgot/:token`,
+    authMiddleware.checkActionToken(EActionTokenType.forgot),
+    authMiddleware.checkActionToken,
+    authController.setForgotPassword
+);
+
+router.post(
+    "/activate",
+    commonMiddleware.isBodyValid(UserValidator.emailValidator),
+    userMiddleware.getDynamicallyOrThrow("email"),
+    authController.sendActivateToken
+);
+
+router.put(
+    `/activate/:token`,
+    authMiddleware.checkActionToken(EActionTokenType.activate),
+    authController.activate
 );
 
 router.post(

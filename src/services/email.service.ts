@@ -4,6 +4,7 @@ import  path from "node:path";
 import EmailTemplates from "email-templates"
 import {allTemplates} from "../constants";
 import {EEmailActions} from "../enums";
+import {configs} from "../configs";
 
 
 class EmailService {
@@ -35,12 +36,14 @@ class EmailService {
     }
 
 
-    public async sendMail(email: string,emailActions: EEmailActions) {
+    public async sendMail(email: string,emailActions: EEmailActions, locals: Record<string, string> ={}
+    ) {
 
-        const templateInfo = allTemplates[emailActions]
-        console.log(templateInfo);
+        const templateInfo = allTemplates[emailActions];
+        // @ts-ignore
+        locals.fromtUrl = configs.FRONT_URL
 
-        const html =await this.templateParser.render(templateInfo.templateName)
+        const html =await this.templateParser.render(templateInfo.templateName,locals)
         return this.transporter.sendMail({
             from: "No reply",
             to: email,

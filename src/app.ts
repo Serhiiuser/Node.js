@@ -25,8 +25,8 @@ app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
 });
 
 
-app.listen(5002,()=>{
-    mongoose.connect('mongodb://127.0.0.1:27017/test2')
-    console.log(`Server has started on PORT  5002!!!`)
+app.listen(5001,()=>{
+    mongoose.connect('mongodb://127.0.0.1:27017/test2').then()
+    console.log(`Server has started on PORT  5001!!!`)
 })
 

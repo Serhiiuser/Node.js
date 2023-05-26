@@ -10,4 +10,8 @@ export const allTemplates: {[key: string]: {subject: string,templateName:string 
             "We control your password, just follow all steps and everything will be good",
         templateName: "forgotPassword",
     },
+    [EEmailActions.ACTIVATE]: {
+        subject: "Activate!",
+        templateName: "activate",
+    },
 };

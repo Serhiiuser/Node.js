@@ -80,9 +80,12 @@ class UserMiddleware {
                 if (!user) {
                     throw new ApiError(`User not found`, 422);
                 }
+                console.log(user)
+
 
                 // @ts-ignore
-                req.res.locals = user;
+                req.res.locals.user = user;
+                console.log(user)
 
                 next();
             } catch (e) {
