@@ -1,5 +1,5 @@
-import nodemailer, { Transporter } from "nodemailer";
-import  path from "node:path";
+import nodemailer, {Transporter} from "nodemailer";
+import path from "node:path";
 
 import EmailTemplates from "email-templates"
 import {allTemplates} from "../constants";
@@ -36,21 +36,26 @@ class EmailService {
     }
 
 
-    public async sendMail(email: string,emailActions: EEmailActions, locals: Record<string, string> ={}
+    public async sendMail(email: string, emailActions: EEmailActions, locals: Record<string, string> = {}
     ) {
+        try {
 
-        const templateInfo = allTemplates[emailActions];
-        // @ts-ignore
-        locals.fromtUrl = configs.FRONT_URL
+            const templateInfo = allTemplates[emailActions];
+            // @ts-ignore
+            locals.fromtUrl = configs.FRONT_URL
 
-        const html =await this.templateParser.render(templateInfo.templateName,locals)
-        return this.transporter.sendMail({
-            from: "No reply",
-            to: email,
-            subject:templateInfo.subject,
-            html
+            const html = await this.templateParser.render(templateInfo.templateName, locals)
+            return this.transporter.sendMail({
+                from: "No reply",
+                to: email,
+                subject: templateInfo.subject,
+                html
 
-        });
+            });
+
+        } catch (e: any) {
+            console.error(e.message)
+        }
     }
 
 }

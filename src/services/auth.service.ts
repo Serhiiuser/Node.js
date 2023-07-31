@@ -7,6 +7,7 @@ import {Token} from "../models";
 import {emailService} from "./email.service";
 import {EEmailActions, EUserStatus} from "../enums";
 import {EActionTokenType} from "../enums";
+import {OldPassword} from "../models/Old.password";
 
 // import {smsService} from "./sms.service";
 
@@ -103,7 +104,7 @@ class AuthService {
             // @ts-ignore
             await Action.create({actionToken, tokenType: EActionTokenType.forgot, _id: user._id});
             await emailService.sendMail(user.email, EEmailActions.FORGOT_PASSWORD, {token: actionToken});
-
+            await OldPassword.create({ _user_id: user._id, password: user.password });
         } catch (e: any) {
             throw new ApiError(e.message, e.status);
         }
@@ -131,13 +132,13 @@ class AuthService {
         //     }
         // }
     }
-    public async setForgotPassword(password: string, id: string): Promise<void> {
+    public async setForgotPassword(password: string, id: string, token: string): Promise<void> {
         try {
             const hashedPassword = await passwordService.hash(password);
 
             await User.updateOne({ _id: id }, { password: hashedPassword });
-            Token.deleteMany({
-                _user_id: id,
+            Action.deleteOne({
+                actionToken: token,
                 tokenType: EActionTokenType.forgot,
             })
         } catch (e:any) {
@@ -203,3 +204,4 @@ class AuthService {
 }
 
 export const authService = new AuthService();
+

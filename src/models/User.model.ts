@@ -1,35 +1,65 @@
-import {model, Schema} from "mongoose"
-import {EGenders, EUserStatus,} from "../enums";
+import { model, Schema } from "mongoose";
 
-const userSchema = new Schema( {
-    name: {
-        type: String,
-    },
-    email: {
-        type: String,
-        unique: true,
-        require: [true,"Email is require"],
-        trim: true,
-        lowercase: true
+import { EGenders, EUserStatus } from "../enums";
+import { IUser, IUserModel } from "../types";
 
-    },
-    password: {
-        type: String,
-        require: [true,"Password is require"],
-    },
-    gender: {
-        type: String,
-        enum: EGenders
-    },
-    status: {
-        type:String,
-        enum: EUserStatus,
-        default: EUserStatus.inactive,
-    },
-},
+const userSchema = new Schema(
     {
-    versionKey: false,
-    timestamps:true
+        name: {
+            type: String,
+            index: true,
+        },
+        email: {
+            type: String,
+            unique: true,
+            required: [true, "Email is required"],
+            trim: true,
+            lowercase: true,
+        },
+        password: {
+            type: String,
+            required: [true, "Password is required"],
+        },
+        age: {
+            type: Number,
+            required: false,
+        },
+        gender: {
+            type: String,
+            enum: EGenders,
+        },
+        avatar: {
+            type: String,
+            required: false,
+        },
+        status: {
+            type: String,
+            enum: EUserStatus,
+            default: EUserStatus.inactive,
+        },
+    },
+    {
+        versionKey: false,
+        timestamps: true,
+    }
+);
+
+userSchema.virtual("nameWithSurname").get(function () {
+    return `${this.name} Piatov`;
 });
 
-export const User = model("user",userSchema)
+userSchema.methods = {
+    // method - for user
+    nameWithAge() {
+        return `${this.name} is ${this.age} years old.`;
+    },
+};
+
+userSchema.statics = {
+    // static - for User
+    async findByName(name: string): Promise<IUser[]> {
+        return this.find({ name });
+    },
+};
+
+export const User = model<IUser, IUserModel>("user", userSchema);

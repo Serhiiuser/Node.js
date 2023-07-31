@@ -1,17 +1,21 @@
 import {NextFunction, Request, Response} from "express";
 
-import {User} from "../models/User.model";
-import {IUser} from "../types/user.types";
-import {userService} from "../services/user.service";
-import {ICommonResponse,} from "../types/common.types";
+import {User} from "../models";
+import {IUser} from "../types";
+import {IQuery, userService} from "../services";
+import {ICommonResponse,} from "../types";
+import {UploadedFile} from "express-fileupload";
+import {userMapper} from "../mappers";
 
 class UserController {
     // @ts-ignore
     public async getAll(req: Request, res: Response, next: NextFunction): Promise<Response<IUser[]>> {
         try {
-            const users = await userService.getAll();
+            const response = await userService.getWithPagination(
+                req.query as unknown as IQuery);
 
-            return res.json(users);
+
+            return res.json(response);
         } catch (e: any) {
             res.json({
                 message: e.message
@@ -20,11 +24,12 @@ class UserController {
     }
 
     // @ts-ignore
-    public async getById(req: Request, res: Response, next: NextFunction): Promise<Response<IUser[]>> {
+    public async getById(req: Request, res: Response, next: NextFunction): Promise<Response<IUser>> {
         try {
             const {user} = res.locals;
+            const response = userMapper.toResponse(user);
 
-            return res.json(user);
+            return res.json(response);
         } catch (e) {
             next(e);
         }
@@ -67,6 +72,8 @@ class UserController {
     }
 
     // @ts-ignore
+    private userMapper: any;
+    // @ts-ignore
     public async delete(req: Request, res: Response, next: NextFunction): Promise<Response<void>> {
         try {
             const {userId} = req.params;
@@ -75,6 +82,45 @@ class UserController {
 
             return res.sendStatus(204).json()
 
+        } catch (e) {
+            next(e);
+        }
+    }
+    public async uploadAvatar(
+        req: Request,
+        res: Response,
+        next: NextFunction
+        // @ts-ignore
+    ): Promise<Response<IUser>> {
+        try {
+            const userEntity = res.locals.user as IUser;
+            const avatar = req.files?.avatar as UploadedFile;
+
+            const user = await userService.uploadAvatar(avatar, userEntity);
+
+            const response = this.userMapper.toResponse(user);
+
+            return res.status(201).json(response);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    public async deleteAvatar(
+        req: Request,
+        res: Response,
+        next: NextFunction
+        // @ts-ignore
+    ): Promise<Response<IUser>> {
+        try {
+            const userEntity = res.locals.user as IUser;
+
+            const user = await userService.deleteAvatar(userEntity);
+
+
+            const response = userMapper.toResponse(user);
+
+            return res.status(201).json(response);
         } catch (e) {
             next(e);
         }

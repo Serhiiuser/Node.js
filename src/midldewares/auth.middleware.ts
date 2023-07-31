@@ -2,9 +2,10 @@ import {NextFunction, Request, Response} from "express";
 
 import {ApiError} from "../errors/";
 import {Action, Token} from "../models";
-import {tokenService} from "../services";
+import {passwordService, tokenService} from "../services";
 import {ETokenType} from "../enums";
 import {EActionTokenType} from "../enums";
+import {OldPassword} from "../models/Old.password";
 
 
 class AuthMiddleware {
@@ -81,7 +82,42 @@ class AuthMiddleware {
             }
         };
     }
+    public async checkOldPassword(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            const { body } = req;
+            // @ts-ignore
+            const { tokenInfo } = req.res.locals;
 
+            const oldPasswords = await OldPassword.find({
+                _user_id: tokenInfo._user_id,
+            });
+
+            if (!oldPasswords) return next();
+
+            await Promise.all(
+                oldPasswords.map(async (record) => {
+                    const isMatched = await passwordService.compare(
+                        body.password,
+                        record.password
+                    );
+                    if (isMatched) {
+                        throw new ApiError(
+                            "Your new password is the same as your old!",
+                            409
+                        );
+                    }
+                })
+            );
+
+            next();
+        } catch (e) {
+            next(e);
+        }
+    }
 
     // public async checkRefreshToken(
     //     req: Request,

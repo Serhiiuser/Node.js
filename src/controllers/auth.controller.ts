@@ -85,7 +85,7 @@ class AuthController {
             // @ts-ignore
             const { tokenInfo } = req.res.locals.user;
 
-            await authService.setForgotPassword(password, tokenInfo._user_id);
+            await authService.setForgotPassword(password, tokenInfo._user_id,req.params.token);
 
             res.sendStatus(200);
         } catch (e) {
